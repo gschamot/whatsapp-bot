@@ -1,3 +1,11 @@
+import os
+import json
+import requests
+from flask import Flask, request
+
+# ✅ Correct order: First, initialize Flask app
+app = Flask(__name__)
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     """Handles incoming messages and sends auto-replies."""
@@ -11,11 +19,11 @@ def webhook():
         message_text = messages[0]["text"]["body"]
 
         # Auto-reply message
-        reply_text = f"Hey {sender_id}, thanks for your message: '{message_text}'."
+        reply_text = f"Hello {sender_id}, thanks for your message: '{message_text}'!"
 
         # Send reply using WhatsApp API
         headers = {
-            "Authorization": f"Bearer {ACCESS_TOKEN}",
+            "Authorization": f"Bearer YOUR_ACCESS_TOKEN",
             "Content-Type": "application/json"
         }
         payload = {
@@ -25,11 +33,14 @@ def webhook():
             "type": "text",
             "text": {"body": reply_text}
         }
-        response = requests.post(f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages", headers=headers, json=payload)
+        response = requests.post(f"https://graph.facebook.com/v19.0/PHONE_NUMBER_ID/messages", headers=headers, json=payload)
         
         print("Reply sent:", response.json())
 
-        # ✅ Fix: Always return a response to Meta
+        # ✅ Ensure a valid return statement
         return json.dumps({"status": "message sent"}), 200
 
     return json.dumps({"status": "no message found"}), 200
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
