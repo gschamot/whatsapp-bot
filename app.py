@@ -1,26 +1,3 @@
-import os
-import json
-import requests
-from flask import Flask, request
-
-app = Flask(__name__)
-
-# Environment variables (hardcoded token)
-VERIFY_TOKEN = os.getenv("WA_VERIFY_TOKEN")
-PHONE_NUMBER_ID = "670463136150869"
-ACCESS_TOKEN = "EAAcSzUCVS8gBO7ZBpN9xkoronm81hTjHgUIFc5MFlN9rstsCc8L2ngRSKe34xDefDRV0S1S6ZAuLCQal8j1LONWCvhHvi61tGZC6rpqO8rtZBSZATr9YlCDkYs2fBSD7VbTQ8M1ZCMt4lSWZCw2mWhux64XwQadLW13e96xq0tbNkB1d4YwBo7nHYasJLpvbtbaqbJgGJdyK1oPmZBwvubyaZCP7ZB3JTXk64fDqAZD"
-
-@app.route("/webhook", methods=["GET"])
-def verify():
-    """Handles the verification handshake from Meta."""
-    mode = request.args.get("hub.mode")
-    token = request.args.get("hub.verify_token")
-    challenge = request.args.get("hub.challenge")
-
-    if mode == "subscribe" and token == VERIFY_TOKEN:
-        return challenge, 200
-    return "Verification failed", 403
-
 @app.route("/webhook", methods=["POST"])
 def webhook():
     """Handles incoming messages and sends auto-replies."""
@@ -36,3 +13,23 @@ def webhook():
         # Auto-reply message
         reply_text = f"Hey {sender_id}, thanks for your message: '{message_text}'."
 
+        # Send reply using WhatsApp API
+        headers = {
+            "Authorization": f"Bearer {ACCESS_TOKEN}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": sender_id,
+            "type": "text",
+            "text": {"body": reply_text}
+        }
+        response = requests.post(f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages", headers=headers, json=payload)
+        
+        print("Reply sent:", response.json())
+
+        # ✅ Fix: Always return a response to Meta
+        return json.dumps({"status": "message sent"}), 200
+
+    return json.dumps({"status": "no message found"}), 200
