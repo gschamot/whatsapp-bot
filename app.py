@@ -23,7 +23,7 @@ def webhook():
 
         # Send reply using WhatsApp API
         headers = {
-            "Authorization": f"Bearer YOUR_ACCESS_TOKEN",
+            "Authorization": f"Bearer EAAcSzUCVS8gBO3eqPXTxqCZCxZBlSZC4jVOZBKZC3mguG4lz6UlNr2mVDvRYIcOwWJk5gZAy9xk6XCODZBe9f1ALnf6wGkhuaSe1MpFzkcrExkakz6RyNGmjA8honZBIvdBZCVQzIgb0cxpjHalMy8IXmKCbZCSDWD9fDQ1bjHRekkXqc2yDWH4vQjuiocLH1fAcsdEjEKtVZC0VoNS8wtjxgYeAL5ova0A2LOnEr4ZD",
             "Content-Type": "application/json"
         }
         payload = {
